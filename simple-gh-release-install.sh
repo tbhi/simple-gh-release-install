@@ -3,7 +3,7 @@ set -e -o pipefail
 
 REPO=$1
 ARCH="linux_amd64|linux64"
-INSTALLED=$HOME/.simple-gh-release-installll
+INSTALLED=$HOME/.simple-gh-release-install
 
 latest_url="$(wget -qO - https://api.github.com/repos/$REPO/releases/latest | egrep "browser_download_url.*($ARCH)" | sed -n '1s/.*"\([^"]*\)"$/\1/p')"
 
