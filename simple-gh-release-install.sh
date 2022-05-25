@@ -27,6 +27,7 @@ ghinstall() {
   [ -z "$latest_url" ] && die "empty latest url - hit github quota?"
   if ! [ -f "$INSTALLED" ] || ! grep -q "$latest_url" "$INSTALLED"; then
     wget -qO - "$latest_url" | xinstall "$latest_url"
+    echo "installed $latest_url"
     echo "$latest_url" >> "$INSTALLED"
   fi
 }
