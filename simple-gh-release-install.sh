@@ -1,11 +1,13 @@
 #!/bin/bash
 set -e -o pipefail
 
-REPO=$1
 ARCH="linux_amd64|linux64"
 INSTALLED=$HOME/.simple-gh-release-install
 
-latest_url="$(wget -qO - https://api.github.com/repos/$REPO/releases/latest | egrep "browser_download_url.*($ARCH)" | sed -n '1s/.*"\([^"]*\)"$/\1/p')"
+die() {
+  echo "$@" 1>&2
+  exit 1
+}
 
 xinstall() {
   case "$1" in
@@ -19,9 +21,21 @@ xinstall() {
   esac    
 }
 
-[ -z "$latest_url" ] && exit 1
+ghinstall() {
+  local repo=$1
+  local latest_url="$(wget -qO - https://api.github.com/repos/$repo/releases/latest | egrep "browser_download_url.*($ARCH)" | sed -n '1s/.*"\([^"]*\)"$/\1/p')"
+  [ -z "$latest_url" ] && die "empty latest url - hit github quota?"
+  if ! [ -f "$INSTALLED" ] || ! grep -q "$latest_url" "$INSTALLED"; then
+    wget -qO - "$latest_url" | xinstall "$latest_url"
+    echo "$latest_url" >> "$INSTALLED"
+  fi
+}
 
-if ! grep -q "$latest_url" "$INSTALLED"; then
-  wget -qO - "$latest_url" | xinstall "$latest_url"
-  echo "$latest_url" >> "$INSTALLED"
+if [ "$1" = "all" ]; then
+  [ -f "$INSTALLED" ] || die "no previously installed"
+  for repo in $(sed 's|.*github.com\/\([^/]*\/[^/]*\)\/.*|\1|' "$INSTALLED" | sort -u); do
+    ghinstall $repo
+  done
+else
+  ghinstall "$1"
 fi
