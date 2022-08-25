@@ -1,7 +1,14 @@
 #!/bin/bash
 set -e -o pipefail
 
-ARCH="linux_amd64|linux64"
+case "$(uname -m)" in
+  x86_64)
+    ARCH="linux_amd64|linux64"
+    ;;
+  armv7l)
+    ARCH="linux_arm|linux_armv7"
+    ;;
+esac
 INSTALLED=$HOME/.simple-gh-release-install
 
 die() {
@@ -25,7 +32,7 @@ xinstall() {
 
 ghinstall() {
   local repo=$1
-  local latest_url="$(wget -qO - https://api.github.com/repos/$repo/releases/latest | egrep "browser_download_url.*($ARCH)" | sed -n '1s/.*"\([^"]*\)"$/\1/p')"
+  local latest_url="$(wget -qO - https://api.github.com/repos/$repo/releases/latest | egrep "browser_download_url.*($ARCH)\." | sed -n '1s/.*"\([^"]*\)"$/\1/p')"
   [ -z "$latest_url" ] && die "empty latest url - hit github quota?"
   if ! [ -f "$INSTALLED" ] || ! grep -q "$latest_url" "$INSTALLED"; then
     wget -qO - "$latest_url" | xinstall "$latest_url" "$repo"
