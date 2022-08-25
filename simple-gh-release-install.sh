@@ -14,7 +14,7 @@ xinstall() {
   local repo=$2
   case "$latest_url" in
     *.tar.gz)
-      tar xz --no-same-owner --strip-components 1 --wildcards \*$(basename $REPO)
+      tar xz --no-same-owner --strip-components 1 --wildcards \*$(basename $repo)
       ;;
     *.bz2)
       bunzip2 > "$(basename $repo)"
