@@ -3,7 +3,7 @@ set -e -o pipefail
 
 case "$(uname -m)" in
   x86_64)
-    ARCH="linux_amd64|linux64"
+    ARCH="linux.*amd64|linux64|linux_x86_64"
     ;;
   armv7l)
     ARCH="linux_arm|linux_armv7"
@@ -21,7 +21,10 @@ xinstall() {
   local repo=$2
   case "$latest_url" in
     *.tar.gz)
-      tar xz --no-same-owner --strip-components 1 --wildcards \*$(basename $repo)
+      local tmp="$(mktemp -d)"
+      tar xz --no-same-owner -C "$tmp"
+      find "$tmp" -type f -perm /u+x -exec mv {} . \;
+      rm -rf "$tmp"
       ;;
     *.bz2)
       bunzip2 > "$(basename $repo)"
@@ -32,7 +35,7 @@ xinstall() {
 
 ghinstall() {
   local repo=$1
-  local latest_url="$(wget -qO - https://api.github.com/repos/$repo/releases/latest | egrep "browser_download_url.*($ARCH)\." | sed -n '1s/.*"\([^"]*\)"$/\1/p')"
+  local latest_url="$(wget -qO - https://api.github.com/repos/$repo/releases/latest | egrep -i "browser_download_url.*($ARCH)\." | sed -n '1s/.*"\([^"]*\)"$/\1/p')"
   [ -z "$latest_url" ] && die "empty latest url - hit github quota?"
   if ! [ -f "$INSTALLED" ] || ! grep -q "$latest_url" "$INSTALLED"; then
     wget -qO - "$latest_url" | xinstall "$latest_url" "$repo"
