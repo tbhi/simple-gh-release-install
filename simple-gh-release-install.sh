@@ -3,7 +3,7 @@ set -e -o pipefail
 
 case "$(uname -m)" in
   x86_64)
-    ARCH="linux.*amd64|linux64|linux_x86_64"
+    ARCH="linux.*amd64|linux64|linux_x86_64|ubuntu-latest-minimal"
     ;;
   armv7l)
     ARCH="linux_arm|linux_armv7"
@@ -30,12 +30,19 @@ xinstall() {
       bunzip2 > "$(basename $repo)"
       chmod +x "$(basename $repo)"
       ;;
+    *.zip)
+      local tmp="$(mktemp -d)"
+      cat > "$tmp"/zip
+      unzip "$tmp"/zip -d "$tmp/out"
+      find "$tmp/out" -type f -perm /u+x -exec mv {} . \;
+      rm -rf "$tmp"
+      ;;
   esac    
 }
 
 ghinstall() {
   local repo=$1
-  local latest_url="$(wget -qO - https://api.github.com/repos/$repo/releases/latest | egrep -i "browser_download_url.*($ARCH)\." | sed -n '1s/.*"\([^"]*\)"$/\1/p')"
+  local latest_url="$(wget -qO - https://api.github.com/repos/$repo/releases/latest | grep -i "browser_download_url.*($ARCH)\." | sed -n '1s/.*"\([^"]*\)"$/\1/p')"
   [ -z "$latest_url" ] && die "empty latest url - hit github quota?"
   if ! [ -f "$INSTALLED" ] || ! grep -q "$latest_url" "$INSTALLED"; then
     wget -qO - "$latest_url" | xinstall "$latest_url" "$repo"
@@ -48,6 +55,7 @@ case "$1" in
   all)
     [ -f "$INSTALLED" ] || die "no previously installed"
     for repo in $(sed 's|.*github.com\/\([^/]*\/[^/]*\)\/.*|\1|' "$INSTALLED" | sort -u); do
+      echo checking $repo
       ghinstall $repo
     done
     ;;

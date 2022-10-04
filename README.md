@@ -9,6 +9,7 @@ Tested with
 - mozilla/geckodriver
 - rfjakob/gocryptfs
 - semaphoreci/cli
+- Frederick888/git-credential-keepassxc
 
 ## Usage
 
