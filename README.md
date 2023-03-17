@@ -20,3 +20,5 @@ Tested with
 
 ## Similar
 - https://github.com/jooola/gh-release-install
+- https://github.com/zyedidia/eget
+
