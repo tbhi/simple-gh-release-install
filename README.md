@@ -10,6 +10,7 @@ Tested with
 - rfjakob/gocryptfs
 - semaphoreci/cli
 - Frederick888/git-credential-keepassxc
+- akamai/akr
 
 ## Usage
 
@@ -21,4 +22,3 @@ Tested with
 ## Similar
 - https://github.com/jooola/gh-release-install
 - https://github.com/zyedidia/eget
-
