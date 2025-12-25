@@ -68,7 +68,7 @@ repo_install() {
       api_url="https://codeberg.org/api/v1/repos/$repo/releases/latest"
       ;;
     *)
-      [[ "$repo" ==https://github.com/tbhi/simple-gh-release-install/tree/master */*/* ]] && repo="${repo#*/}"
+      [[ "$repo" == */*/* ]] && repo="${repo#*/}"
       api_url="https://api.github.com/repos/$repo/releases/latest"
       ;;
   esac
