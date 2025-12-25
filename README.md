@@ -1,5 +1,5 @@
 
-# Simple Github Release Installer
+# Simple Github/Codeberg Release Installer
 
 Script to install the latest release from a github project
 
@@ -11,6 +11,7 @@ Tested with
 - semaphoreci/cli
 - Frederick888/git-credential-keepassxc
 - akamai/akr
+- codeberg/readeck/readeck
 
 ## Usage
 
